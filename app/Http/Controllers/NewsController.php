@@ -73,7 +73,28 @@ class NewsController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            // find ID
+            $news_id = News::find($id);
+
+            // check if id not found
+            if(!$news_id){
+                return response ()->json ([
+                    "status" => 404,
+                    "message" => "news not found"
+                ], 404);
+            }
+            return response ()->json ([
+                "status" => 200,
+                "message" => "get news",
+                "data" => $news_id,
+            ], 200);
+        }catch (\Exception $e){
+            return response ()->json ([
+                "status" => 500,
+                "message" => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -89,6 +110,29 @@ class NewsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            // find id
+            $news_id = News::find($id);
+            // check if id not exist
+            if(!$news_id){
+                return response ()->json ([
+                    "status" => 404,
+                    "message" => "news not found"
+                ], 404);
+            }
+
+            // delete data from DB
+            $news_id->delete();
+            return response ()->json ([
+                "status" => 200,
+                "message" => "deleted news",
+                "data" => $news_id,
+            ], 200);
+        }catch (\Exception $e){
+            return response ()->json ([
+                "status" => 500,
+                "message" => $e->getMessage()
+            ], 500);
+        }
     }
 }
