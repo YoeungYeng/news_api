@@ -25,4 +25,12 @@ class News extends Model
 //    public function category (){
 //        return $this->belongsTo(Category::class);
 //    }
+
+    protected function  casts (): array
+    {
+        return [
+            "created_at" => "datetime: d-m-Y",
+            "updated_at" => "datetime: d-m-Y",
+        ];
+    }
 }

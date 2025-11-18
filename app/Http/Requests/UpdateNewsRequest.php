@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Intervention\Image\Laravel\Facades\Image;
 
 class UpdateNewsRequest extends FormRequest
 {
@@ -11,7 +14,7 @@ class UpdateNewsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +25,72 @@ class UpdateNewsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "title" => "sometimes|string",
+            "description" => "sometimes|string",
+            "image" => "sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048",
+            "image_logo" => "sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048",
+            "title_logo" => "sometimes|string",
+            "slug" => "sometimes|string",
         ];
     }
+
+
+    // handle image for upload for post
+    // crop image for logo
+    public function uploadImageLogo ($image)
+    {
+        // check if it is Image
+        if ($image && $image->isValid ()) {
+            // Generate a unique filename
+            $filename = Str::uuid () . '.' . $image->getClientOriginalExtension ();
+
+            // Read and crop/resize the image using Intervention
+            $processedImage = Image::read ($image)
+                ->cover (60, 60) // Resize to 300x300 pixels
+                // ->crop(300, 300, 50, 50) // Or optionally crop
+                ->encodeByExtension ($image->getClientOriginalExtension (), quality: 80);
+
+            // Save to public disk
+            Storage::disk ('public')->put ("images/logo/{$filename}", $processedImage);
+
+            // Return the public URL
+            return asset ("storage/images/{$filename}");
+        }
+
+        return null;
+    }
+
+    public function uploadImage ($image)
+    {
+        // check if it is Image
+        if ($image && $image->isValid ()) {
+            // Generate a unique filename
+            $filename = Str::uuid () . '.' . $image->getClientOriginalExtension ();
+
+            // Read and crop/resize the image using Intervention
+            $processedImage = Image::read ($image)
+                ->cover (300, 300) // Resize to 300x300 pixels
+                // ->crop(300, 300, 50, 50) // Or optionally crop
+                ->encodeByExtension ($image->getClientOriginalExtension (), quality: 80);
+
+            // Save to public disk
+            Storage::disk ('public')->put ("images/{$filename}", $processedImage);
+
+            // Return the public URL
+            return asset ("storage/images/{$filename}");
+        }
+
+        return null;
+    }
+
+    // check validated
+    public function failedValidation (\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        throw new \Illuminate\Validation\ValidationException(
+            $validator,
+            Response ()->json (['errors' => $validator->errors ()], 422)
+        );
+    }
+
+    //
 }

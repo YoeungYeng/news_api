@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreNewsRequest;
+use App\Http\Requests\UpdateNewsRequest;
 use App\Models\News;
 use Illuminate\Http\Request;
 
@@ -100,9 +101,33 @@ class NewsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateNewsRequest $request, string $id)
     {
-        //
+        try {
+            // find news id
+            $news_id = News::find($id);
+            // check if news don't exist
+            if(!$news_id){
+                return response ()->json ([
+                    "status" => 404,
+                    "message" => "news not found"
+                ], 404);
+            }
+            // validated
+            $validated = $request->validated();
+            // updated to database
+            $news_id-> update ($validated);
+            return response ()->json ([
+                "status" => 200,
+                "message" => "updated news",
+                "data" => $news_id,
+            ], 200);
+        }catch (\Exception $e){
+            return response ()->json ([
+                "status" => 500,
+                "message" => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

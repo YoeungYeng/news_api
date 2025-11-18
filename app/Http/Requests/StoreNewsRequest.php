@@ -90,4 +90,13 @@ class StoreNewsRequest extends FormRequest
             Response ()->json (['errors' => $validator->errors ()], 422)
         );
     }
+
+    // formate date
+    protected function formatDate ()
+    {
+        return [
+            "created_at" => "datetime: d-m-Y",
+            "updated_at" => "datetime: d-m-Y",
+        ];
+    }
 }
