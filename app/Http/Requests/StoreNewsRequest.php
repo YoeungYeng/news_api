@@ -53,7 +53,7 @@ class StoreNewsRequest extends FormRequest
             Storage::disk ('public')->put ("images/logo/{$filename}", $processedImage);
 
             // Return the public URL
-            return asset ("storage/images/{$filename}");
+            return asset ("storage/images/logo/{$filename}");
         }
 
         return null;

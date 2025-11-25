@@ -115,6 +115,19 @@ class NewsController extends Controller
             }
             // validated
             $validated = $request->validated();
+            // handle image
+            if($request->hasFile('image')){
+                $validated["image"] = $request->uploadImage($request->file('image'));
+
+            }else{
+                $validated["image"] = null;
+            }
+            // handle image for logo
+            if($request->hasFile("image_logo")){
+                $validated["image_logo"] = $request->uploadImageLogo ($request->file ('image_logo'));
+            }else{
+                $validated["image_logo"] = null;
+            }
             // updated to database
             $news_id-> update ($validated);
             return response ()->json ([

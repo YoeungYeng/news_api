@@ -17,12 +17,12 @@ class NewsFactory extends Factory
     public function definition (): array
     {
         return [
-            "title" => $this->faker->name (),
+            "title" => $this->faker->title (),
             "description" => $this->faker->text (),
             "image" => $this->faker->imageUrl (),
             "slug" => $this->faker->slug (),
             "image_logo" => $this->faker->imageUrl (),
-            "title_logo" => $this->faker->title (),
+            "title_logo" => $this->faker->name(),
         ];
     }
 }
